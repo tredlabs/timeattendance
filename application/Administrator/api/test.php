@@ -1,14 +1,14 @@
 <?php
 include "zklibrary.php";
-$zk = new ZKLibrary();
+$zk = new ZKLibrary('63.143.100.225', 4370);
 date_default_timezone_set("Jamaica");
 	$today = date("Y-m-d");
 $i=0;
 
-$conn=mysqli_connect('localhost','root','','comptech_timeattendance_sahs');
+$conn=mysqli_connect('localhost','comptech_time','time2020','comptech_timeattendance');
 
 if($zk->connect()){
-	echo "connected <br>"; 
+	//echo "connected <br>"; 
 	$users = $zk->getUser();
 //print_r($users);
 $attendances=$zk->getAttendance();
@@ -33,13 +33,28 @@ foreach($attendances as $key=>$attendance)
 
 //echo "Date: $date1 Day: ". $date2." ".$clockedInTimeLong."".$usersID."".$users[$usersID][1]."<br/>";
 
+  $sql = "SELECT * FROM users where id='$usersID'"; 				
+		
+		$result = $conn->query($sql);
+			
+		if ($result->num_rows > 0)
+		{
+			// output data of each row
+			while($row = $result->fetch_assoc())
+			{
+					
+				$schedule=$row["schedule_shift"];
+				
+			}
+		
+		}
+		
 
 
 
 
 
-
-  	if ($result = mysqli_query($conn, "SELECT $date2 FROM schedule_time WHERE staff_id='$usersID'")) {
+  	if ($result = mysqli_query($conn, "SELECT $date2 FROM schedule_time WHERE schedule_type='$schedule'")) {
 	while($info = mysqli_fetch_array( $result ))  { 
 	$checkTime= $info["$date2"];
 	$remove= array(":");
@@ -149,7 +164,7 @@ $result = $conn->query($sql);
 						
 		if($conn->query($sql) === TRUE){
 
-echo "Status: Clockin: ". $date1." ".$clockedInTimeLong." User ID: ".$usersID.""."<br/>";
+//echo "Status: Clockin: ". $date1." ".$clockedInTimeLong." User ID: ".$usersID.""."<br/>";
 		}
 		else
 					{
@@ -158,7 +173,7 @@ echo "Status: Clockin: ". $date1." ".$clockedInTimeLong." User ID: ".$usersID.""
 					
 		
 	//$conn=mysqli_connect('localhost','root','','comptech_timeattendance_sahs');
-		 $sql= "INSERT INTO attendance(user_id,date,time,activity,note) VALUES('$usersID','$date1','','O','new')";
+		 $sql= "INSERT INTO attendance(user_id,date,time,activity,note) VALUES('$usersID','$date1','no','O','new')";
   		   if($conn->query($sql) === TRUE){
 
 //echo"Clock out punch";
@@ -228,7 +243,7 @@ echo $hUserID;
 
 
 
-	if($update=="yes"){
+	if($update=="no"){
 	//	echo"eewrwerewr";
 			
 				$sql = "UPDATE attendance set note=''
@@ -249,7 +264,12 @@ echo $hUserID;
 		}
 
 
-
+$sql = "UPDATE attendance set note=''
+			  where activity='O' and date!='$today'";
+					  		
+					 if($conn->query($sql) === TRUE){
+//echo"eewrwerewr";
+		}
 
 
 
